@@ -11,5 +11,22 @@ module.exports = {
   plugins: ['react-refresh'],
   rules: {
     'react-refresh/only-export-components': 'warn',
+    'guard-for-in': 'off',
+    'max-len': 'off',
+    'no-await-in-loop': 'off',
+    'no-param-reassign': 'off',
+    'no-restricted-syntax': 'off',
+    'no-unused-vars': 'warn',
+    'newline-per-chained-call': 'off',
+    'no-underscore-dangle': 'off',
+    'global-require': 'off',
+    camelcase: 'off',
+    'operator-linebreak': [
+      'error',
+      'after',
+      { overrides: { '?': 'ignore', ':': 'ignore' } },
+    ],
+    indent: 'off',
+    'object-curly-newline': ['error', { consistent: true }],
   },
-}
+};
