@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import reactLogo from '../assets/react.svg'
-import viteLogo from '/vite.svg'
+import Protected from '/src/components/Protected';
+import reactLogo from '/src/assets/react.svg';
+import viteLogo from '/vite.svg';
 
 const List = () => {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
 
   return (
     <div>
@@ -29,6 +30,12 @@ const List = () => {
       </p>
     </div>
   );
-}
+};
 
-export default List;
+const ProtectedComponent = (props) => (
+  <Protected>
+    <List {...props} />
+  </Protected>
+);
+
+export default ProtectedComponent;
