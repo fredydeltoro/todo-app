@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { makeLogin } from '/src/redux/actions/accountActions';
+import './styles.css';
 
 const Login = () => {
   const { user, error, loading } = useSelector((state) => state.account);
@@ -16,24 +17,32 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (user) {
+    const token = localStorage.getItem('token');
+    if (user || token) {
       navigate('/');
     }
   }, [user]);
 
-  useEffect(() => {
-    console.log('a ver =======>', error);
-  }, [error]);
-
   return (
-    <div>
+    <div className="login">
       <h1>Login</h1>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={(e) => onSubmit(e)} className="offset-md-4 col-md-4">
+        {error && (
+          <div className="alert alert-danger" role="alert">
+            {error.error}
+          </div>
+        )}
         <div className="mb-3">
           <label htmlFor="user" className="form-label">
             User
           </label>
-          <input type="text" className="form-control" id="user" name="user" />
+          <input
+            type="text"
+            className="form-control"
+            id="user"
+            name="user"
+            disabled={loading}
+          />
         </div>
         <div className="mb-3">
           <label htmlFor="password" className="form-label">
@@ -44,12 +53,18 @@ const Login = () => {
             className="form-control"
             id="password"
             name="password"
+            disabled={loading}
           />
         </div>
-        <button type="submit" className="btn btn-primary">
-          Submit
-        </button>
+        <div className="d-grid gap-2">
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            Submit
+          </button>
+        </div>
       </form>
+      {loading && (
+        <div className="spinner-border text-primary" role="status"></div>
+      )}
     </div>
   );
 };

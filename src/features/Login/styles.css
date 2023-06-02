@@ -1,0 +1,14 @@
+.login{
+  position: relative;
+  padding-top: 7%;
+}
+
+h1{
+  margin-bottom: 80px;
+}
+
+.spinner-border{
+  position: absolute;
+  top: 68%;
+  left: 48%;
+}

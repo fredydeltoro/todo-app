@@ -1,4 +1,5 @@
 import apiClient from '/src/lib/apiClient';
+import jwt_decode from 'jwt-decode';
 
 // Actions
 export const SET_USER = 'account/setUser';
@@ -26,11 +27,22 @@ export const setError = (error) => ({
 });
 
 export const makeLogin = (body) => async (dispatch) => {
-  dispatch(loading);
+  dispatch(loading());
   try {
     const res = await apiClient.post('/api/login', body);
-    console.log('a ver ====>', res);
+    const token = res.data.token;
+
+    localStorage.setItem('token', token);
+    dispatch(setUser(jwt_decode(token)));
   } catch (error) {
     dispatch(setError(error.response.data));
+  }
+};
+
+export const checkLogin = () => (dispatch) => {
+  const token = localStorage.getItem('token');
+
+  if (token) {
+    dispatch(setUser(jwt_decode(token)));
   }
 };
