@@ -1,7 +1,14 @@
-import { SET_USER, REMOVE_USER } from '../actions/accountActions';
+import {
+  SET_USER,
+  REMOVE_USER,
+  SET_ERROR,
+  SET_LOADING,
+} from '../actions/accountActions';
 
 const initialState = {
   user: null,
+  loading: false,
+  error: null,
 };
 
 const accountReducer = (state = initialState, action) => {
@@ -11,6 +18,12 @@ const accountReducer = (state = initialState, action) => {
 
     case REMOVE_USER:
       return { ...state, user: null };
+
+    case SET_LOADING:
+      return { ...state, loading: true };
+
+    case SET_ERROR:
+      return { ...state, loading: false, error: action.payload };
 
     default:
       return state;

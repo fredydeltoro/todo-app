@@ -14,8 +14,12 @@ const Protected = ({ children }) => {
 
   return (
     <div>
-      <header>algo</header>
-      <main>{children}</main>
+      {user && (
+        <>
+          <header>algo</header>
+          <main>{children}</main>
+        </>
+      )}
     </div>
   );
 };
