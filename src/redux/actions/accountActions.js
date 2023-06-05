@@ -43,6 +43,16 @@ export const checkLogin = () => (dispatch) => {
   const token = localStorage.getItem('token');
 
   if (token) {
-    dispatch(setUser(jwt_decode(token)));
+    const user = jwt_decode(token);
+    const date = new Date(0);
+    date.setUTCSeconds(user.exp);
+    const now = new Date();
+
+    if (date > now) {
+      dispatch(setUser(user));
+    } else {
+      localStorage.removeItem('token');
+      dispatch(setUser(null));
+    }
   }
 };
