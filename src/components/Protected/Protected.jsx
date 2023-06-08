@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { checkLogin, setUser } from '/src/redux/actions/accountActions';
 import { Link } from 'react-router-dom';
+import apiClient from '/src/lib/apiClient';
 
 const Protected = ({ children }) => {
   const { user } = useSelector((state) => state.account);
@@ -22,6 +23,7 @@ const Protected = ({ children }) => {
   const onClick = (e) => {
     e.preventDefault();
     localStorage.removeItem('token');
+    apiClient.defaults.headers.common['Authorization'] = '';
     dispatch(setUser(null));
   };
 
@@ -68,9 +70,7 @@ const Protected = ({ children }) => {
             </nav>
           </header>
 
-          <main className="container-xxl bd-gutter flex-wrap flex-lg-nowrap">
-            {children}
-          </main>
+          <main className="container">{children}</main>
         </>
       )}
     </div>

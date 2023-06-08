@@ -47,6 +47,7 @@ export const checkLogin = () => (dispatch) => {
     const date = new Date(0);
     date.setUTCSeconds(user.exp);
     const now = new Date();
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
     if (date > now) {
       dispatch(setUser(user));
