@@ -1,33 +1,56 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadLists } from '/src/redux/actions/listActions';
 import Protected from '/src/components/Protected';
-import reactLogo from '/src/assets/react.svg';
-import viteLogo from '/vite.svg';
+import Modal from '/src/components/Modal';
 
 const List = () => {
-  const [count, setCount] = useState(0);
+  const dispatch = useDispatch();
+  const lists = useSelector((state) => state.todos?.lists);
+  const [show, setShow] = useState(false);
+  const showModal = () => setShow(true);
+  const handleClose = () => setShow(false);
+
+  useEffect(() => {
+    dispatch(loadLists());
+  }, []);
 
   return (
-    <div>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="row">
+      <div className="col-md-8 offset-2">
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <h2>Lists</h2>
+          <div className="btn btn-success" onClick={showModal}>
+            <i className="fa fa-plus"></i> New List
+          </div>
+        </div>
+
+        <hr />
+
+        <ul className="list-group list-group-flush">
+          {lists.map((list) => (
+            <li
+              className="list-group-item d-flex justify-content-between align-items-start"
+              key={list.id}
+            >
+              <div className="ms-2 me-auto">
+                <div className="fw-bold">
+                  <h4>{list.name}</h4>
+                </div>
+                {list.description}
+              </div>
+              <span className="badge bg-primary rounded-pill">14</span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Modal show={show} title="Create List" handleClose={handleClose} />
     </div>
   );
 };
