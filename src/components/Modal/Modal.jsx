@@ -1,19 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
+import styles from './styles.module.css';
 
 export default function Modal({
   children,
   title,
   saveLabel,
   show,
-  ok = () => {},
+  handleAccept = () => {},
   handleClose = () => {},
+  loading,
 }) {
   const ref = useRef(null);
   const [showModal, setShowModal] = useState(false);
   const [showBack, setShowBack] = useState(false);
 
-  const onOk = (e) => {
-    ok();
+  const accept = (e) => {
+    handleAccept();
   };
 
   const onClose = () => {
@@ -51,7 +53,15 @@ export default function Modal({
                 onClick={onClose}
               ></button>
             </div>
-            <div className="modal-body">{children}</div>
+            <div className="modal-body">
+              {children}
+              {loading && (
+                <div
+                  className={`spinner-border text-primary ${styles.loading}`}
+                  role="status"
+                ></div>
+              )}
+            </div>
             <div className="modal-footer">
               <button
                 type="button"
@@ -61,7 +71,11 @@ export default function Modal({
               >
                 Close
               </button>
-              <button type="button" className="btn btn-success" onClick={onOk}>
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={accept}
+              >
                 {saveLabel ? saveLabel : 'Save changes'}
               </button>
             </div>

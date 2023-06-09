@@ -1,10 +1,10 @@
-import { SET_LOADING } from '../actions/accountActions';
 import {
   ADD_TODO,
   TOGGLE_TODO,
   ADD_LIST,
   SET_LISTS,
-  SET_ERROR
+  SET_ERROR,
+  SET_LOADING
 } from '../actions/listActions';
 
 // Reducers
@@ -63,12 +63,13 @@ const todoReducer = (state = initialState, action) => {
 
     case ADD_LIST:
       const newList = {
-        id: Date.now(),
-        title: action.payload.title,
+        ...action.payload,
         todos: [],
       };
       return {
         ...state,
+        loading: false,
+        error: null,
         lists: [...state.lists, newList],
       };
     default:

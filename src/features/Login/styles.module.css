@@ -3,11 +3,11 @@
   padding-top: 7%;
 }
 
-h1{
+.title{
   margin-bottom: 80px;
 }
 
-.spinner-border{
+.loading{
   position: absolute;
   top: 68%;
   left: 48%;

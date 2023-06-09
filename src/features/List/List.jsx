@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadLists } from '/src/redux/actions/listActions';
 import Protected from '/src/components/Protected';
-import Modal from '/src/components/Modal';
+import ListModal from './ListModal';
 
 const List = () => {
   const dispatch = useDispatch();
@@ -50,7 +50,7 @@ const List = () => {
           ))}
         </ul>
       </div>
-      <Modal show={show} title="Create List" handleClose={handleClose} />
+      <ListModal show={show} title="Create List" handleClose={handleClose} />
     </div>
   );
 };
