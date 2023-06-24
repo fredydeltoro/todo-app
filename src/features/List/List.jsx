@@ -3,13 +3,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loadLists } from '/src/redux/actions/listActions';
 import Protected from '/src/components/Protected';
 import ListModal from './ListModal';
+import { setError } from '/src/redux/actions/listActions';
 
 const List = () => {
   const dispatch = useDispatch();
   const lists = useSelector((state) => state.todos?.lists);
   const [show, setShow] = useState(false);
   const showModal = () => setShow(true);
-  const handleClose = () => setShow(false);
+
+  const handleClose = () => {
+    setShow(false);
+    dispatch(setError(null));
+  };
 
   useEffect(() => {
     dispatch(loadLists());
