@@ -43,19 +43,32 @@ export const loadLists = () => async (dispatch) => {
   try {
     const res = await apiClient.get('/api/todos');
     dispatch(setLists(res.data));
+    return res.data
   } catch (error) {
     dispatch(setError(error.res.data));
+    return { error: error.res.data }
   }
 };
 
 export const createList = (data) => async (dispatch) => {
+  function onSuccess(success) {
+    dispatch(addList(success))
+
+    return success
+  }
+
+  function onError(err) {
+    dispatch(setError(err))
+    return err
+  }
+
   try {
     dispatch(setLoading())
     const res = await apiClient.post('/api/todos', data)
-    console.log('a ver =====>', res)
-    dispatch(addList(res.data))
+
+    return onSuccess(res.data)
   } catch (error) {
-    console.log('a ver =====>', error)
-    dispatch(setError(error.response.data))
+
+    return onError(error.response.data)
   }
 }

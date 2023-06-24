@@ -18,9 +18,12 @@ const ListModal = ({ show, handleClose }) => {
     });
   };
 
-  const create = async () => {
-    await dispatch(createList(body));
-    handleClose();
+  const create = () => {
+    dispatch(createList(body)).then((result) => {
+      if (!result.errors) {
+        handleClose();
+      }
+    });
   };
 
   return (
