@@ -31,6 +31,7 @@ export const makeLogin = (body) => async (dispatch) => {
   try {
     const res = await apiClient.post('/api/login', body);
     const token = res.data.token;
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
     localStorage.setItem('token', token);
     dispatch(setUser(jwt_decode(token)));
