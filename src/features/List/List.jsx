@@ -50,7 +50,9 @@ const List = () => {
                 </div>
                 {list.description}
               </div>
-              <span className="badge bg-primary rounded-pill">14</span>
+              <span className="badge bg-primary rounded-pill">
+                {list.itemscount}
+              </span>
             </li>
           ))}
         </ul>

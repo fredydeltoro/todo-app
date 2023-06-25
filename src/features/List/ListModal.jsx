@@ -36,8 +36,8 @@ const ListModal = ({ show, handleClose }) => {
     >
       <form>
         {error &&
-          error.errors.map((err) => (
-            <div className="alert alert-danger" role="alert">
+          error.errors.map((err, index) => (
+            <div className="alert alert-danger" role="alert" key={index}>
               {err}
             </div>
           ))}
