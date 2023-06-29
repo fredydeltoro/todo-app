@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadLists } from '/src/redux/actions/listActions';
+import { Link } from 'react-router-dom';
 import Protected from '/src/components/Protected';
+import {
+  setError,
+  loadLists,
+  selectLists,
+} from '/src/redux/actions/listActions';
 import ListModal from './ListModal';
-import { setError } from '/src/redux/actions/listActions';
 
 const List = () => {
   const dispatch = useDispatch();
-  const lists = useSelector((state) => state.todos?.lists);
+  const lists = useSelector(selectLists);
   const [show, setShow] = useState(false);
   const showModal = () => setShow(true);
 
@@ -46,7 +50,9 @@ const List = () => {
             >
               <div className="ms-2 me-auto">
                 <div className="fw-bold">
-                  <h4>{list.name}</h4>
+                  <Link to={`/${list.id}`}>
+                    <h4>{list.name}</h4>
+                  </Link>
                 </div>
                 {list.description}
               </div>

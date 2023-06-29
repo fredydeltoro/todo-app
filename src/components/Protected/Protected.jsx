@@ -11,7 +11,8 @@ const Protected = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!user) {
+    const token = localStorage.getItem('token');
+    if (!user && !token) {
       navigate('/login');
     }
   }, [user]);

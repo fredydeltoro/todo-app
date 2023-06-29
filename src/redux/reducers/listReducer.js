@@ -4,7 +4,8 @@ import {
   ADD_LIST,
   SET_LISTS,
   SET_ERROR,
-  SET_LOADING
+  SET_LOADING,
+  SET_TODOS
 } from '../actions/listActions';
 
 // Reducers
@@ -16,6 +17,21 @@ const initialState = {
 
 const todoReducer = (state = initialState, action) => {
   switch (action.type) {
+    case SET_TODOS:
+      const lists = state.lists.map((list) => {
+        if (list.id === action.payload.listId) {
+          return {
+            ...list,
+            todos: action.payload.todos
+          }
+        }
+        return list
+      })
+
+      return {
+        ...state,
+        lists
+      }
     case ADD_TODO:
       const { listId, title } = action.payload;
       const updatedLists = state.lists.map((list) =>
@@ -53,7 +69,7 @@ const todoReducer = (state = initialState, action) => {
       };
 
     case SET_LOADING:
-      return { ...state, loading: true }
+      return { ...state, loading: true };
 
     case SET_LISTS:
       return { ...state, lists: action.payload, loading: false, error: null };
