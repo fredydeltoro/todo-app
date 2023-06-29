@@ -1,18 +1,28 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import Protected from '/src/components/Protected';
 import {
   selectTodoList,
   loadTodos,
   loadListComplete,
 } from '/src/redux/actions/listActions';
-import Protected from '/src/components/Protected';
+import TodoModal from './TodoModal';
 
 const Todos = () => {
   let { listId } = useParams();
   listId = parseInt(listId);
   const dispatch = useDispatch();
   const list = useSelector(selectTodoList(listId));
+  const [showModal, setShow] = useState(false);
+
+  const handleClose = () => {
+    setShow(false);
+  };
+
+  const openModal = () => {
+    setShow(true);
+  };
 
   useEffect(() => {
     if (list && list.id) {
@@ -32,8 +42,8 @@ const Todos = () => {
             alignItems: 'center',
           }}
         >
-          <h2>{list.name}</h2>
-          <div className="btn btn-success">
+          <h2>{list?.name}</h2>
+          <div className="btn btn-success" onClick={openModal}>
             <i className="fa fa-plus"></i> New Todo
           </div>
         </div>
@@ -41,18 +51,16 @@ const Todos = () => {
         <hr />
 
         <ul className="list-group list-group-flush">
-          {list.todos?.map((todos) => (
+          {list?.todos?.map((todo) => (
             <li
               className="list-group-item d-flex justify-content-between align-items-start"
-              key={list.id}
+              key={todo.id}
             >
               <div className="ms-2 me-auto">
                 <div className="fw-bold">
-                  <Link to={`/${todos.id}`}>
-                    <h4>{todos.name}</h4>
-                  </Link>
+                  <h4>{todos.name}</h4>
                 </div>
-                {todos.description}
+                {todo.description}
               </div>
               {/* <span className="badge bg-primary rounded-pill">
                 {list.itemscount}
@@ -61,6 +69,7 @@ const Todos = () => {
           ))}
         </ul>
       </div>
+      <TodoModal show={showModal} handleClose={handleClose} />
     </div>
   );
 };
