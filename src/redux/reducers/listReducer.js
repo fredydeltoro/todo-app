@@ -33,14 +33,14 @@ const todoReducer = (state = initialState, action) => {
         lists
       }
     case ADD_TODO:
-      const { listId, title } = action.payload;
+      const { listId, todo } = action.payload;
       const updatedLists = state.lists.map((list) =>
         list.id === listId
           ? {
             ...list,
             todos: [
               ...list.todos,
-              { id: Date.now(), title, completed: false },
+              todo
             ],
           }
           : list,
@@ -48,6 +48,8 @@ const todoReducer = (state = initialState, action) => {
       return {
         ...state,
         lists: updatedLists,
+        error: null,
+        loading: false
       };
     case TOGGLE_TODO:
       const { todoId } = action.payload;
@@ -80,7 +82,6 @@ const todoReducer = (state = initialState, action) => {
     case ADD_LIST:
       const newList = {
         ...action.payload,
-        todos: [],
       };
       return {
         ...state,

@@ -54,13 +54,13 @@ const Todos = () => {
           {list?.todos?.map((todo) => (
             <li
               className="list-group-item d-flex justify-content-between align-items-start"
-              key={todo.id}
+              key={todo?.id}
             >
               <div className="ms-2 me-auto">
                 <div className="fw-bold">
-                  <h4>{todos.name}</h4>
+                  <h4>{todo?.name}</h4>
                 </div>
-                {todo.description}
+                {todo?.description}
               </div>
               {/* <span className="badge bg-primary rounded-pill">
                 {list.itemscount}

@@ -23,9 +23,9 @@ export const setTodos = (listId, todos) => ({
   payload: { listId, todos },
 });
 
-export const addTodo = (listId, title) => ({
+export const addTodo = (listId, todo) => ({
   type: ADD_TODO,
-  payload: { listId, title },
+  payload: { listId, todo },
 });
 
 export const toggleTodo = (listId, todoId) => ({
@@ -69,6 +69,7 @@ export const loadListComplete = (listId) => async (dispatch) => {
     const resTodos = await apiClient.get(`/api/todos/${listId}/items`)
     const list = resList.data
     list.todos = resTodos.data
+
     dispatch(addList(list));
   } catch (error) {
     dispatch(setError(error.res.data));
@@ -101,8 +102,31 @@ export const createList = (data) => async (dispatch) => {
     dispatch(setLoading());
     const res = await apiClient.post('/api/todos', data);
 
-    return onSuccess(res.data);
+    return onSuccess({ ...res.data, todos: [] });
   } catch (error) {
     return onError(error.response.data);
   }
 };
+
+export const createTodo = (listId, data) => async (dispatch) => {
+  function onSuccess(success) {
+    dispatch(addTodo(listId, success))
+
+    return success
+  }
+
+  function onError(err) {
+    dispatch(setError(err))
+
+    return { error: err }
+  }
+
+  try {
+    dispatch(setLoading());
+    const res = await apiClient.post(`/api/todos/${listId}/items`, data)
+
+    return onSuccess(res.data)
+  } catch (err) {
+    return onError(err.response.data)
+  }
+}
