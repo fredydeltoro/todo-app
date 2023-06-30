@@ -6,6 +6,7 @@ import {
   selectTodoList,
   loadTodos,
   loadListComplete,
+  patchTodo,
 } from '/src/redux/actions/listActions';
 import TodoModal from './TodoModal';
 
@@ -15,6 +16,10 @@ const Todos = () => {
   const dispatch = useDispatch();
   const list = useSelector(selectTodoList(listId));
   const [showModal, setShow] = useState(false);
+
+  const handleCheck = (todo, checked) => {
+    dispatch(patchTodo(listId, todo.id, { status: checked }));
+  };
 
   const handleClose = () => {
     setShow(false);
@@ -62,9 +67,13 @@ const Todos = () => {
                 </div>
                 {todo?.description}
               </div>
-              {/* <span className="badge bg-primary rounded-pill">
-                {list.itemscount}
-              </span> */}
+              <input
+                type="checkbox"
+                className="form-check-input"
+                onChange={(e) => handleCheck(todo, e.target.checked)}
+                checked={todo?.status}
+                id={todo?.id}
+              />
             </li>
           ))}
         </ul>

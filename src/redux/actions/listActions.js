@@ -2,7 +2,7 @@ import apiClient from '/src/lib/apiClient';
 
 // Actions
 export const ADD_TODO = 'lists/addTodo';
-export const TOGGLE_TODO = 'list/toggleTodo';
+export const UPDATE_TODO = 'list/updateTodo';
 export const ADD_LIST = 'lists/addList';
 export const SET_LISTS = 'lists/setLists';
 export const SET_ERROR = 'lists/setError';
@@ -28,9 +28,9 @@ export const addTodo = (listId, todo) => ({
   payload: { listId, todo },
 });
 
-export const toggleTodo = (listId, todoId) => ({
-  type: TOGGLE_TODO,
-  payload: { listId, todoId },
+export const updateTodo = (listId, upTodo) => ({
+  type: UPDATE_TODO,
+  payload: { listId, upTodo },
 });
 
 export const addList = (payload) => ({
@@ -65,25 +65,24 @@ export const loadLists = () => async (dispatch) => {
 
 export const loadListComplete = (listId) => async (dispatch) => {
   try {
-    const resList = await apiClient.get(`/api/todos/${listId}`)
-    const resTodos = await apiClient.get(`/api/todos/${listId}/items`)
-    const list = resList.data
-    list.todos = resTodos.data
+    const resList = await apiClient.get(`/api/todos/${listId}`);
+    const resTodos = await apiClient.get(`/api/todos/${listId}/items`);
+    const list = resList.data;
+    list.todos = resTodos.data;
 
     dispatch(addList(list));
   } catch (error) {
     dispatch(setError(error.res.data));
   }
-}
+};
 
 export const loadTodos = (listId) => async (dispatch) => {
   try {
-    const res = await apiClient.get(`/api/todos/${listId}/items`)
-    dispatch(setTodos(listId, res.data))
+    const res = await apiClient.get(`/api/todos/${listId}/items`);
+    dispatch(setTodos(listId, res.data));
   } catch (error) {
-    dispatch(setError(error.res.data))
+    dispatch(setError(error.res.data));
   }
-
 };
 
 export const createList = (data) => async (dispatch) => {
@@ -110,23 +109,48 @@ export const createList = (data) => async (dispatch) => {
 
 export const createTodo = (listId, data) => async (dispatch) => {
   function onSuccess(success) {
-    dispatch(addTodo(listId, success))
+    dispatch(addTodo(listId, success));
 
-    return success
+    return success;
   }
 
   function onError(err) {
-    dispatch(setError(err))
+    dispatch(setError(err));
 
-    return { error: err }
+    return { error: err };
   }
 
   try {
     dispatch(setLoading());
-    const res = await apiClient.post(`/api/todos/${listId}/items`, data)
+    const res = await apiClient.post(`/api/todos/${listId}/items`, data);
 
-    return onSuccess(res.data)
+    return onSuccess(res.data);
   } catch (err) {
-    return onError(err.response.data)
+    return onError(err.response.data);
   }
-}
+};
+
+export const patchTodo = (listId, todoId, props) => async (dispatch) => {
+  function onSuccess(success) {
+    dispatch(updateTodo(listId, success));
+
+    return success;
+  }
+
+  function onError(err) {
+    dispatch(setError(err));
+
+    return { error: err };
+  }
+
+  try {
+    const res = await apiClient.patch(
+      `/api/todos/${listId}/items/${todoId}`,
+      props,
+    );
+
+    return onSuccess(res.data);
+  } catch (error) {
+    return onError(error.response.data);
+  }
+};

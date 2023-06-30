@@ -1,11 +1,11 @@
 import {
   ADD_TODO,
-  TOGGLE_TODO,
+  UPDATE_TODO,
   ADD_LIST,
   SET_LISTS,
   SET_ERROR,
   SET_LOADING,
-  SET_TODOS
+  SET_TODOS,
 } from '../actions/listActions';
 
 // Reducers
@@ -22,26 +22,23 @@ const todoReducer = (state = initialState, action) => {
         if (list.id === action.payload.listId) {
           return {
             ...list,
-            todos: action.payload.todos
-          }
+            todos: action.payload.todos,
+          };
         }
-        return list
-      })
+        return list;
+      });
 
       return {
         ...state,
-        lists
-      }
+        lists,
+      };
     case ADD_TODO:
       const { listId, todo } = action.payload;
       const updatedLists = state.lists.map((list) =>
         list.id === listId
           ? {
             ...list,
-            todos: [
-              ...list.todos,
-              todo
-            ],
+            todos: [...list.todos, todo],
           }
           : list,
       );
@@ -49,18 +46,16 @@ const todoReducer = (state = initialState, action) => {
         ...state,
         lists: updatedLists,
         error: null,
-        loading: false
+        loading: false,
       };
-    case TOGGLE_TODO:
-      const { todoId } = action.payload;
+    case UPDATE_TODO:
+      const { upTodo } = action.payload;
       const updatedListsWithToggle = state.lists.map((list) =>
-        list.id === listId
+        list.id === action.payload.listId
           ? {
             ...list,
             todos: list.todos.map((todo) =>
-              todo.id === todoId
-                ? { ...todo, completed: !todo.completed }
-                : todo,
+              todo.id === upTodo.id ? upTodo : todo,
             ),
           }
           : list,
