@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Modal from '/src/components/Modal';
-import { createTodo } from '/src/redux/actions/listActions';
+import { createTodo, patchTodo } from '/src/redux/actions/listActions';
 
-const TodoModal = ({ show, handleClose }) => {
+const TodoModal = ({ show, handleClose, todo }) => {
   const { error, loading } = useSelector((state) => state.todos);
   const dispatch = useDispatch();
   let { listId } = useParams();
@@ -23,20 +23,39 @@ const TodoModal = ({ show, handleClose }) => {
     });
   };
 
-  const create = () => {
-    dispatch(createTodo(listId, body)).then((result) => {
-      if (!result.error) {
-        handleClose();
-      }
-    });
+  const handleAccept = () => {
+    if (!todo) {
+      dispatch(createTodo(listId, body)).then((result) => {
+        if (!result.error) {
+          handleClose();
+        }
+      });
+    } else {
+      dispatch(patchTodo(listId, todo.id, body)).then((result) => {
+        if (!result.error) {
+          handleClose();
+        }
+      });
+    }
   };
+
+  useEffect(() => {
+    if (todo) {
+      setBody({
+        name: todo.name,
+        description: todo.description,
+      });
+    } else {
+      setBody({ name: '', description: '' });
+    }
+  }, [todo]);
 
   return (
     <Modal
       show={show}
       title="Create Todo"
       handleClose={handleClose}
-      handleAccept={create}
+      handleAccept={handleAccept}
       loading={loading}
     >
       <form>

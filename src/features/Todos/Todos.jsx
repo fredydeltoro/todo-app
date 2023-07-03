@@ -7,8 +7,10 @@ import {
   loadTodos,
   loadListComplete,
   patchTodo,
+  setError,
 } from '/src/redux/actions/listActions';
 import TodoModal from './TodoModal';
+import styles from './todo.module.css';
 
 const Todos = () => {
   let { listId } = useParams();
@@ -16,6 +18,7 @@ const Todos = () => {
   const dispatch = useDispatch();
   const list = useSelector(selectTodoList(listId));
   const [showModal, setShow] = useState(false);
+  const [current, setCurrent] = useState(null);
 
   const handleCheck = (todo, checked) => {
     dispatch(patchTodo(listId, todo.id, { status: checked }));
@@ -23,10 +26,17 @@ const Todos = () => {
 
   const handleClose = () => {
     setShow(false);
+    setCurrent(null);
+    dispatch(setError(null));
   };
 
   const openModal = () => {
     setShow(true);
+  };
+
+  const openEdit = (todo) => {
+    setCurrent(todo);
+    openModal();
   };
 
   useEffect(() => {
@@ -67,9 +77,23 @@ const Todos = () => {
                 </div>
                 {todo?.description}
               </div>
+
+              <div className={styles.menu}>
+                <span className={`${styles.menuBtn} btn btn-outline-danger`}>
+                  <i className="fa fa-trash"></i>
+                </span>
+
+                <span
+                  className={`${styles.menuBtn} btn btn-outline-info`}
+                  onClick={() => openEdit(todo)}
+                >
+                  <i className="fa fa-pencil"></i>
+                </span>
+              </div>
+
               <input
                 type="checkbox"
-                className="form-check-input"
+                className={`${styles.menuCheck} form-check-input`}
                 onChange={(e) => handleCheck(todo, e.target.checked)}
                 checked={todo?.status}
                 id={todo?.id}
@@ -78,7 +102,7 @@ const Todos = () => {
           ))}
         </ul>
       </div>
-      <TodoModal show={showModal} handleClose={handleClose} />
+      <TodoModal show={showModal} handleClose={handleClose} todo={current} />
     </div>
   );
 };
