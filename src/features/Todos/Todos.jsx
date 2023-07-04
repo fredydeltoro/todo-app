@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Protected from '/src/components/Protected';
+import DeleteModal from '/src/components/DeleteModal';
 import {
   selectTodoList,
   loadTodos,
   loadListComplete,
   patchTodo,
+  deleteTodo,
   setError,
 } from '/src/redux/actions/listActions';
 import TodoModal from './TodoModal';
@@ -18,16 +20,35 @@ const Todos = () => {
   const dispatch = useDispatch();
   const list = useSelector(selectTodoList(listId));
   const [showModal, setShow] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
   const [current, setCurrent] = useState(null);
 
   const handleCheck = (todo, checked) => {
     dispatch(patchTodo(listId, todo.id, { status: checked }));
   };
 
+  const handleDelete = (todo) => {
+    setCurrent(todo);
+    setShowDelete(true);
+  };
+
+  const closeDelete = () => {
+    setCurrent(null);
+    setShowDelete(false);
+  };
+
   const handleClose = () => {
     setShow(false);
     setCurrent(null);
     dispatch(setError(null));
+  };
+
+  const confirmDelete = () => {
+    dispatch(deleteTodo(listId, current.id)).then((result) => {
+      if (!result.error) {
+        closeDelete();
+      }
+    });
   };
 
   const openModal = () => {
@@ -79,7 +100,10 @@ const Todos = () => {
               </div>
 
               <div className={styles.menu}>
-                <span className={`${styles.menuBtn} btn btn-outline-danger`}>
+                <span
+                  className={`${styles.menuBtn} btn btn-outline-danger`}
+                  onClick={() => handleDelete(todo)}
+                >
                   <i className="fa fa-trash"></i>
                 </span>
 
@@ -103,6 +127,12 @@ const Todos = () => {
         </ul>
       </div>
       <TodoModal show={showModal} handleClose={handleClose} todo={current} />
+      <DeleteModal
+        show={showDelete}
+        message={`Are you sure you want to delete todo: ${current?.name}?`}
+        handleClose={closeDelete}
+        handleConf={confirmDelete}
+      />
     </div>
   );
 };

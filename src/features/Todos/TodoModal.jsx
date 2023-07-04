@@ -4,15 +4,17 @@ import { useParams } from 'react-router-dom';
 import Modal from '/src/components/Modal';
 import { createTodo, patchTodo } from '/src/redux/actions/listActions';
 
+const defaultState = {
+  name: '',
+  description: '',
+};
+
 const TodoModal = ({ show, handleClose, todo }) => {
   const { error, loading } = useSelector((state) => state.todos);
   const dispatch = useDispatch();
   let { listId } = useParams();
   listId = parseInt(listId);
-  const [body, setBody] = useState({
-    name: '',
-    description: '',
-  });
+  const [body, setBody] = useState({ ...defaultState });
 
   const onChange = (e) => {
     const { value, id } = e.target;
@@ -28,6 +30,7 @@ const TodoModal = ({ show, handleClose, todo }) => {
       dispatch(createTodo(listId, body)).then((result) => {
         if (!result.error) {
           handleClose();
+          setBody({ ...defaultState });
         }
       });
     } else {
@@ -46,7 +49,7 @@ const TodoModal = ({ show, handleClose, todo }) => {
         description: todo.description,
       });
     } else {
-      setBody({ name: '', description: '' });
+      setBody({ ...defaultState });
     }
   }, [todo]);
 

@@ -4,7 +4,8 @@ import styles from './styles.module.css';
 export default function Modal({
   children,
   title,
-  saveLabel,
+  acceptLabel,
+  closeLabel,
   show,
   handleAccept = () => {},
   handleClose = () => {},
@@ -69,14 +70,14 @@ export default function Modal({
                 data-bs-dismiss="modal"
                 onClick={onClose}
               >
-                Close
+                {closeLabel ? closeLabel : 'Close'}
               </button>
               <button
                 type="button"
                 className="btn btn-success"
                 onClick={accept}
               >
-                {saveLabel ? saveLabel : 'Save changes'}
+                {acceptLabel ? acceptLabel : 'Save changes'}
               </button>
             </div>
           </div>

@@ -2,6 +2,7 @@ import apiClient from '/src/lib/apiClient';
 
 // Actions
 export const ADD_TODO = 'lists/addTodo';
+export const REMOVE_TODO = 'lists/removeTodo';
 export const UPDATE_TODO = 'list/updateTodo';
 export const ADD_LIST = 'lists/addList';
 export const SET_LISTS = 'lists/setLists';
@@ -26,6 +27,11 @@ export const setTodos = (listId, todos) => ({
 export const addTodo = (listId, todo) => ({
   type: ADD_TODO,
   payload: { listId, todo },
+});
+
+export const removeTodo = (listId, todoId) => ({
+  type: REMOVE_TODO,
+  payload: { listId, todoId },
 });
 
 export const updateTodo = (listId, upTodo) => ({
@@ -148,6 +154,28 @@ export const patchTodo = (listId, todoId, props) => async (dispatch) => {
       `/api/todos/${listId}/items/${todoId}`,
       props,
     );
+
+    return onSuccess(res.data);
+  } catch (error) {
+    return onError(error.response.data);
+  }
+};
+
+export const deleteTodo = (listId, todoId) => async (dispatch) => {
+  function onSuccess(success) {
+    dispatch(removeTodo(listId, todoId));
+
+    return success;
+  }
+
+  function onError(err) {
+    dispatch(setError(err));
+
+    return { error: err };
+  }
+
+  try {
+    const res = await apiClient.delete(`/api/todos/${listId}/items/${todoId}`);
 
     return onSuccess(res.data);
   } catch (error) {
