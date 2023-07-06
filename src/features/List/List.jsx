@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Protected from '/src/components/Protected';
+import Menu from '/src/components/Menu';
 import {
   setError,
   loadLists,
@@ -13,11 +14,19 @@ const List = () => {
   const dispatch = useDispatch();
   const lists = useSelector(selectLists);
   const [show, setShow] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [currentList, setCurrentList] = useState(null);
   const showModal = () => setShow(true);
 
   const handleClose = () => {
     setShow(false);
+    setCurrentList(null);
     dispatch(setError(null));
+  };
+
+  const handleEdit = (list) => {
+    setCurrentList(list);
+    setShow(true);
   };
 
   useEffect(() => {
@@ -56,14 +65,25 @@ const List = () => {
                 </div>
                 {list.description}
               </div>
-              <span className="badge bg-primary rounded-pill">
+
+              <Menu
+                handleEdit={() => handleEdit(list)}
+                handleDelete={() => {}}
+              />
+
+              <span className="badge bg-primary" style={{ fontSize: 14 }}>
                 {list.itemscount}
               </span>
             </li>
           ))}
         </ul>
       </div>
-      <ListModal show={show} title="Create List" handleClose={handleClose} />
+      <ListModal
+        list={currentList}
+        show={show}
+        title="Create List"
+        handleClose={handleClose}
+      />
     </div>
   );
 };

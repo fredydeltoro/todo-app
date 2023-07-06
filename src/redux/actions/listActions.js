@@ -5,6 +5,7 @@ export const ADD_TODO = 'lists/addTodo';
 export const REMOVE_TODO = 'lists/removeTodo';
 export const UPDATE_TODO = 'list/updateTodo';
 export const ADD_LIST = 'lists/addList';
+export const UPDATE_LIST = 'list/updateList';
 export const SET_LISTS = 'lists/setLists';
 export const SET_ERROR = 'lists/setError';
 export const SET_LOADING = 'lists/setLoading';
@@ -41,7 +42,12 @@ export const updateTodo = (listId, upTodo) => ({
 
 export const addList = (payload) => ({
   type: ADD_LIST,
-  payload: payload,
+  payload,
+});
+
+export const updateList = (listId, upList) => ({
+  type: UPDATE_LIST,
+  payload: { listId, upList },
 });
 
 export const setLists = (lists) => ({
@@ -110,6 +116,28 @@ export const createList = (data) => async (dispatch) => {
     return onSuccess({ ...res.data, todos: [] });
   } catch (error) {
     return onError(error.response.data);
+  }
+};
+
+export const putList = (listId, data) => async (dispatch) => {
+  function onSuccess(success) {
+    dispatch(updateList(listId, success));
+
+    return success;
+  }
+
+  function onError(error) {
+    dispatch(setError(error));
+
+    return { error };
+  }
+
+  try {
+    const res = await apiClient.put(`/api/todos/${listId}`, data);
+
+    return onSuccess(res.data);
+  } catch (err) {
+    return onError(err.response.data);
   }
 };
 

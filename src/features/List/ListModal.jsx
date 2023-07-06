@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Modal from '/src/components/Modal';
-import { createList } from '/src/redux/actions/listActions';
+import { createList, putList } from '/src/redux/actions/listActions';
 
-const ListModal = ({ show, handleClose }) => {
+const defaultState = {
+  name: '',
+  description: '',
+};
+
+const ListModal = ({ show, handleClose, list }) => {
   const { error, loading } = useSelector((state) => state.todos);
   const dispatch = useDispatch();
-  const [body, setBody] = useState({
-    name: '',
-    description: '',
-  });
+  const [body, setBody] = useState({ ...defaultState });
 
   const onChange = (e) => {
     setBody({
@@ -18,13 +20,32 @@ const ListModal = ({ show, handleClose }) => {
     });
   };
 
-  const create = () => {
-    dispatch(createList(body)).then((result) => {
-      if (!result.errors) {
-        handleClose();
-      }
-    });
+  const handleAccept = () => {
+    if (list) {
+      dispatch(putList(list.id, body)).then((result) => {
+        if (!result.error) {
+          handleClose();
+        }
+      });
+    } else {
+      dispatch(createList(body)).then((result) => {
+        if (!result.errors) {
+          handleClose();
+        }
+      });
+    }
   };
+
+  useEffect(() => {
+    if (list) {
+      setBody({
+        name: list.name,
+        description: list.description,
+      });
+    } else {
+      setBody({ ...defaultState });
+    }
+  }, [list]);
 
   return (
     <Modal
@@ -32,7 +53,7 @@ const ListModal = ({ show, handleClose }) => {
       title="Create List"
       handleClose={handleClose}
       loading={loading}
-      handleAccept={create}
+      handleAccept={handleAccept}
     >
       <form>
         {error &&

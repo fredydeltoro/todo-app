@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Protected from '/src/components/Protected';
 import DeleteModal from '/src/components/DeleteModal';
+import Menu from '/src/components/Menu';
 import {
   selectTodoList,
   loadTodos,
@@ -99,21 +100,12 @@ const Todos = () => {
                 {todo?.description}
               </div>
 
-              <div className={styles.menu}>
-                <span
-                  className={`${styles.menuBtn} btn btn-outline-danger`}
-                  onClick={() => handleDelete(todo)}
-                >
-                  <i className="fa fa-trash"></i>
-                </span>
-
-                <span
-                  className={`${styles.menuBtn} btn btn-outline-info`}
-                  onClick={() => openEdit(todo)}
-                >
-                  <i className="fa fa-pencil"></i>
-                </span>
-              </div>
+              <Menu
+                style={{ marginTop: 5 }}
+                handleEdit={openEdit}
+                handleDelete={handleDelete}
+                element={todo}
+              />
 
               <input
                 type="checkbox"

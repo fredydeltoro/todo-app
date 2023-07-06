@@ -3,6 +3,7 @@ import {
   REMOVE_TODO,
   UPDATE_TODO,
   ADD_LIST,
+  UPDATE_LIST,
   SET_LISTS,
   SET_ERROR,
   SET_LOADING,
@@ -89,6 +90,19 @@ const todoReducer = (state = initialState, action) => {
 
     case SET_LISTS:
       return { ...state, lists: action.payload, loading: false, error: null };
+
+    case UPDATE_LIST:
+      const upLists = state.lists.map((list) => {
+        if (list.id === action.payload.listId) {
+          return {
+            ...action.payload.upList,
+            itemscount: list.itemscount,
+          };
+        }
+        return list;
+      });
+
+      return { ...state, lists: upLists, loading: false, error: null };
 
     case SET_ERROR:
       return { ...state, error: action.payload, loading: false };
