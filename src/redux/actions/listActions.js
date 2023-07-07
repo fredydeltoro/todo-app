@@ -5,6 +5,7 @@ export const ADD_TODO = 'lists/addTodo';
 export const REMOVE_TODO = 'lists/removeTodo';
 export const UPDATE_TODO = 'list/updateTodo';
 export const ADD_LIST = 'lists/addList';
+export const REMOVE_LIST = 'lists/removeList';
 export const UPDATE_LIST = 'list/updateList';
 export const SET_LISTS = 'lists/setLists';
 export const SET_ERROR = 'lists/setError';
@@ -53,6 +54,11 @@ export const updateList = (listId, upList) => ({
 export const setLists = (lists) => ({
   type: SET_LISTS,
   payload: lists,
+});
+
+export const removeList = (listId) => ({
+  type: REMOVE_LIST,
+  payload: { listId },
 });
 
 export const setError = (error) => ({
@@ -138,6 +144,28 @@ export const putList = (listId, data) => async (dispatch) => {
     return onSuccess(res.data);
   } catch (err) {
     return onError(err.response.data);
+  }
+};
+
+export const deleteList = (listId) => async (dispatch) => {
+  function onSuccess(success) {
+    dispatch(removeList(listId));
+
+    return success;
+  }
+
+  function onError(err) {
+    dispatch(setError(err));
+
+    return { error: err };
+  }
+
+  try {
+    const res = await apiClient.delete(`/api/todos/${listId}`);
+
+    return onSuccess(res.data);
+  } catch (error) {
+    return onError(error.response.data);
   }
 };
 

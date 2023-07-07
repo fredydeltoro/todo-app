@@ -3,6 +3,7 @@ import {
   REMOVE_TODO,
   UPDATE_TODO,
   ADD_LIST,
+  REMOVE_LIST,
   UPDATE_LIST,
   SET_LISTS,
   SET_ERROR,
@@ -62,12 +63,22 @@ const todoReducer = (state = initialState, action) => {
 
         return list;
       });
+
       return {
         ...state,
         lists: newLists,
         error: null,
         loading: false,
       };
+
+    case REMOVE_LIST:
+      return {
+        ...state,
+        lists: state.lists.filter((l) => l.id !== action.payload.listId),
+        error: null,
+        loading: false,
+      };
+
     case UPDATE_TODO:
       const { upTodo } = action.payload;
       const updatedListsWithToggle = state.lists.map((list) =>

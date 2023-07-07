@@ -3,10 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Protected from '/src/components/Protected';
 import Menu from '/src/components/Menu';
+import DeleteModal from '/src/components/DeleteModal';
 import {
   setError,
   loadLists,
   selectLists,
+  deleteList,
 } from '/src/redux/actions/listActions';
 import ListModal from './ListModal';
 
@@ -27,6 +29,24 @@ const List = () => {
   const handleEdit = (list) => {
     setCurrentList(list);
     setShow(true);
+  };
+
+  const closeDelete = () => {
+    setShowDelete(false);
+    setCurrentList(null);
+  };
+
+  const handleDelete = (list) => {
+    setCurrentList(list);
+    setShowDelete(true);
+  };
+
+  const confirm = () => {
+    dispatch(deleteList(currentList.id)).then((result) => {
+      if (!result.error) {
+        closeDelete();
+      }
+    });
   };
 
   useEffect(() => {
@@ -68,7 +88,7 @@ const List = () => {
 
               <Menu
                 handleEdit={() => handleEdit(list)}
-                handleDelete={() => {}}
+                handleDelete={() => handleDelete(list)}
               />
 
               <span className="badge bg-primary" style={{ fontSize: 14 }}>
@@ -83,6 +103,12 @@ const List = () => {
         show={show}
         title="Create List"
         handleClose={handleClose}
+      />
+      <DeleteModal
+        show={showDelete}
+        message={`Are you sure you want to delete list: ${currentList?.name}?`}
+        handleClose={closeDelete}
+        handleConf={() => confirm()}
       />
     </div>
   );
