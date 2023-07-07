@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import Protected from '/src/components/Protected';
-import Menu from '/src/components/Menu';
 import DeleteModal from '/src/components/DeleteModal';
 import {
   setError,
@@ -11,6 +9,7 @@ import {
   deleteList,
 } from '/src/redux/actions/listActions';
 import ListModal from './ListModal';
+import Item from './Item';
 
 const List = () => {
   const dispatch = useDispatch();
@@ -26,20 +25,20 @@ const List = () => {
     dispatch(setError(null));
   };
 
-  const handleEdit = (list) => {
+  const handleEdit = useCallback((list) => {
     setCurrentList(list);
     setShow(true);
-  };
+  }, []);
 
   const closeDelete = () => {
     setShowDelete(false);
     setCurrentList(null);
   };
 
-  const handleDelete = (list) => {
+  const handleDelete = useCallback((list) => {
     setCurrentList(list);
     setShowDelete(true);
-  };
+  }, []);
 
   const confirm = () => {
     dispatch(deleteList(currentList.id)).then((result) => {
@@ -77,23 +76,11 @@ const List = () => {
               className="list-group-item d-flex justify-content-between align-items-start"
               key={list.id}
             >
-              <div className="ms-2 me-auto">
-                <div className="fw-bold">
-                  <Link to={`/${list.id}`}>
-                    <h4>{list.name}</h4>
-                  </Link>
-                </div>
-                {list.description}
-              </div>
-
-              <Menu
-                handleEdit={() => handleEdit(list)}
-                handleDelete={() => handleDelete(list)}
+              <Item
+                list={list}
+                handleDelete={handleDelete}
+                handleEdit={handleEdit}
               />
-
-              <span className="badge bg-primary" style={{ fontSize: 14 }}>
-                {list.itemscount}
-              </span>
             </li>
           ))}
         </ul>
