@@ -21,4 +21,4 @@ const Menu = ({ handleDelete, handleEdit, element, ...props }) => {
   );
 };
 
-export default Menu;
+export default React.memo(Menu);
