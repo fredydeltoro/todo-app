@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { makeLogin } from '/src/redux/actions/accountActions';
+import { makeLogin } from '/src/redux/reducers/accountReducer';
 import style from './styles.module.css';
 
 const Login = () => {
