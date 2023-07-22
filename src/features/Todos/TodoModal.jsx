@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Modal from '/src/components/Modal';
-import { createTodo, patchTodo } from '/src/redux/actions/listActions';
+import { createTodo, updateTodo } from '/src/redux/reducers/listReducer';
 
 const defaultState = {
   name: '',
@@ -27,18 +27,20 @@ const TodoModal = ({ show, handleClose, todo }) => {
 
   const handleAccept = () => {
     if (!todo) {
-      dispatch(createTodo(listId, body)).then((result) => {
+      dispatch(createTodo({ listId, data: body })).then((result) => {
         if (!result.error) {
           handleClose();
           setBody({ ...defaultState });
         }
       });
     } else {
-      dispatch(patchTodo(listId, todo.id, body)).then((result) => {
-        if (!result.error) {
-          handleClose();
-        }
-      });
+      dispatch(updateTodo({ listId, todoId: todo.id, props: body })).then(
+        (result) => {
+          if (!result.error) {
+            handleClose();
+          }
+        },
+      );
     }
   };
 

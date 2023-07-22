@@ -7,9 +7,9 @@ import {
   selectTodoList,
   loadTodos,
   loadListComplete,
-  deleteTodo,
   setError,
-} from '/src/redux/actions/listActions';
+  deleteTodo,
+} from '/src/redux/reducers/listReducer';
 import TodoModal from './TodoModal';
 import Todo from './Todo';
 
@@ -39,7 +39,7 @@ const Todos = () => {
   };
 
   const confirmDelete = () => {
-    dispatch(deleteTodo(listId, current.id)).then((result) => {
+    dispatch(deleteTodo({ listId, todoId: current.id })).then((result) => {
       if (!result.error) {
         closeDelete();
       }

@@ -1,12 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import apiClient from '/src/lib/apiClient';
-import {
-  ADD_TODO,
-  REMOVE_TODO,
-  UPDATE_TODO,
-  REMOVE_LIST,
-  SET_TODOS,
-} from '../actions/listActions';
 
 // Selectors
 export const selectLists = (state) => state.todos.lists;
@@ -63,13 +56,86 @@ export const updateList = createAsyncThunk(
 
 export const deleteList = createAsyncThunk(
   'todos/deleteList',
-  async (listId) => {
+  async (listId, { rejectWithValue }) => {
     try {
       const res = await apiClient.delete(`/api/todos/${listId}`);
 
       return listId;
     } catch (error) {
-      return error.response.data;
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const createTodo = createAsyncThunk(
+  'todos/createTodo',
+  async ({ listId, data }, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.post(`/api/todos/${listId}/items`, data);
+
+      return { listId, data: res.data };
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const loadTodos = createAsyncThunk(
+  'todos/loadTodos',
+  async (listId, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.get(`/api/todos/${listId}/items`);
+
+      return { listId, data: res.data };
+    } catch (error) {
+      return rejectWithValue(error.res.data);
+    }
+  },
+);
+
+export const updateTodo = createAsyncThunk(
+  'todos/updateTodo',
+  async ({ listId, todoId, props }, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.patch(
+        `/api/todos/${listId}/items/${todoId}`,
+        props,
+      );
+
+      return { listId, data: res.data };
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const loadListComplete = createAsyncThunk(
+  'todos/loadListComplete',
+  async (listId, { rejectWithValue }) => {
+    try {
+      const resList = await apiClient.get(`/api/todos/${listId}`);
+      const resTodos = await apiClient.get(`/api/todos/${listId}/items`);
+      const list = resList.data;
+      list.todos = resTodos.data;
+
+      return list;
+    } catch (error) {
+      return rejectWithValue(error.res.data);
+    }
+  },
+);
+
+export const deleteTodo = createAsyncThunk(
+  'todos/deleteTodo',
+  async ({ listId, todoId }, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.delete(
+        `/api/todos/${listId}/items/${todoId}`,
+      );
+
+      return { listId, todoId };
+    } catch (error) {
+      return rejectWithValue(error.response.data);
     }
   },
 );
@@ -136,92 +202,91 @@ const todoSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    [loadTodos.pending]: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    [loadTodos.fulfilled]: (state, action) => {
+      let currentList = state.lists.find(
+        (list) => list.id === action.payload.listId,
+      );
+      currentList.todos = action.payload.data;
+      state.loading = false;
+    },
+    [loadTodos.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [createTodo.pending]: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    [createTodo.fulfilled]: (state, action) => {
+      let currentList = state.lists.find(
+        (list) => list.id === action.payload.listId,
+      );
+      currentList.todos.push(action.payload.data);
+      state.loading = false;
+    },
+    [createTodo.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [updateTodo.pending]: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    [updateTodo.fulfilled]: (state, action) => {
+      state.loading = false;
+      const currentList = state.lists.find(
+        (list) => list.id === action.payload.listId,
+      );
+
+      const index = currentList.todos.findIndex(
+        (todo) => todo.id === action.payload.data.id,
+      );
+
+      currentList.todos.splice(index, 1, action.payload.data);
+    },
+    [updateTodo.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [loadListComplete.pending]: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    [loadListComplete.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.lists.push(action.payload);
+    },
+    [loadListComplete.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [deleteTodo.pending]: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    [deleteTodo.fulfilled]: (state, action) => {
+      state.loading = false;
+      const currentList = state.lists.find(
+        (list) => list.id === action.payload.listId,
+      );
+
+      const index = currentList.todos.findIndex(
+        (todo) => todo.id === action.payload.todoId,
+      );
+
+      currentList.todos.splice(index, 1);
+    },
+    [deleteTodo.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
   },
 });
 
 export const { setError } = todoSlice.actions;
-
-const todoReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case SET_TODOS:
-      const lists = state.lists.map((list) => {
-        if (list.id === action.payload.listId) {
-          return {
-            ...list,
-            todos: action.payload.todos,
-          };
-        }
-        return list;
-      });
-
-      return {
-        ...state,
-        lists,
-      };
-    case ADD_TODO:
-      const updatedLists = state.lists.map((list) =>
-        list.id === action.payload.listId
-          ? {
-              ...list,
-              todos: [...list.todos, action.payload.todo],
-            }
-          : list,
-      );
-      return {
-        ...state,
-        lists: updatedLists,
-        error: null,
-        loading: false,
-      };
-
-    case REMOVE_TODO:
-      let { listId, todoId } = action.payload;
-      const newLists = state.lists.map((list) => {
-        if (list.id === listId) {
-          return {
-            ...list,
-            todos: list.todos.filter((t) => todoId !== t.id),
-          };
-        }
-
-        return list;
-      });
-
-      return {
-        ...state,
-        lists: newLists,
-        error: null,
-        loading: false,
-      };
-
-    case REMOVE_LIST:
-      return {
-        ...state,
-        lists: state.lists.filter((l) => l.id !== action.payload.listId),
-        error: null,
-        loading: false,
-      };
-
-    case UPDATE_TODO:
-      const { upTodo } = action.payload;
-      const updatedListsWithToggle = state.lists.map((list) =>
-        list.id === action.payload.listId
-          ? {
-              ...list,
-              todos: list.todos.map((todo) =>
-                todo.id === upTodo.id ? upTodo : todo,
-              ),
-            }
-          : list,
-      );
-      return {
-        ...state,
-        lists: updatedListsWithToggle,
-      };
-
-    default:
-      return state;
-  }
-};
 
 export default todoSlice.reducer;
