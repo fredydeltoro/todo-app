@@ -7,9 +7,9 @@ import {
   selectTodoList,
   loadTodos,
   loadListComplete,
-  setError,
   deleteTodo,
-} from '/src/redux/reducers/listReducer';
+} from '/src/redux/actions/listActions';
+import { setError } from '/src/redux/reducers/listReducer';
 import TodoModal from './TodoModal';
 import Todo from './Todo';
 

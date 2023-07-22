@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Modal from '/src/components/Modal';
-import { createTodo, updateTodo } from '/src/redux/reducers/listReducer';
+import { createTodo, updateTodo } from '/src/redux/actions/listActions';
 
 const defaultState = {
   name: '',

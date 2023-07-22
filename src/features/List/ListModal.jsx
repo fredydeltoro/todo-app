@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Modal from '/src/components/Modal';
-import { createList, updateList } from '/src/redux/reducers/listReducer';
+import { createList, updateList } from '/src/redux/actions/listActions';
 
 const defaultState = {
   name: '',

@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import Protected from '/src/components/Protected';
 import DeleteModal from '/src/components/DeleteModal';
 import {
-  setError,
   loadLists,
   selectLists,
   deleteList,
-} from '/src/redux/reducers/listReducer';
+} from '/src/redux/actions/listActions';
+import { setError } from '/src/redux/reducers/listReducer';
 import ListModal from './ListModal';
 import Item from './Item';
 

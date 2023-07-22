@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import Menu from '/src/components/Menu';
-import { updateTodo } from '/src/redux/reducers/listReducer';
+import { updateTodo } from '/src/redux/actions/listActions';
 import styles from './todo.module.css';
 
 const Todo = ({ todo, listId, openEdit, handleDelete }) => {
