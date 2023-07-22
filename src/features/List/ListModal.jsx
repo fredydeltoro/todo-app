@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Modal from '/src/components/Modal';
-import { createList, putList } from '/src/redux/actions/listActions';
+import { createList, updateList } from '/src/redux/reducers/listReducer';
 
 const defaultState = {
   name: '',
@@ -22,7 +22,7 @@ const ListModal = ({ show, handleClose, list }) => {
 
   const handleAccept = () => {
     if (list) {
-      dispatch(putList(list.id, body)).then((result) => {
+      dispatch(updateList({ listId: list.id, data: body })).then((result) => {
         if (!result.error) {
           handleClose();
         }

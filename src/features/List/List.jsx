@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Protected from '/src/components/Protected';
 import DeleteModal from '/src/components/DeleteModal';
@@ -7,7 +7,7 @@ import {
   loadLists,
   selectLists,
   deleteList,
-} from '/src/redux/actions/listActions';
+} from '/src/redux/reducers/listReducer';
 import ListModal from './ListModal';
 import Item from './Item';
 

@@ -1,15 +1,20 @@
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import apiClient from '/src/lib/apiClient';
 import {
   ADD_TODO,
   REMOVE_TODO,
   UPDATE_TODO,
-  ADD_LIST,
   REMOVE_LIST,
-  UPDATE_LIST,
-  SET_LISTS,
-  SET_ERROR,
-  SET_LOADING,
   SET_TODOS,
 } from '../actions/listActions';
+
+// Selectors
+export const selectLists = (state) => state.todos.lists;
+export const selectTodoList = (listId) => (state) => {
+  const lists = selectLists(state);
+
+  return lists.find((list) => list.id === listId);
+};
 
 // Reducers
 const initialState = {
@@ -17,6 +22,124 @@ const initialState = {
   loading: false,
   error: null,
 };
+
+export const loadLists = createAsyncThunk(
+  'todos/loadLists',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.get('/api/todos');
+      return res.data;
+    } catch (error) {
+      return rejectWithValue({ error: error.res.data });
+    }
+  },
+);
+
+export const createList = createAsyncThunk(
+  'todos/createList',
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.post('/api/todos', data);
+
+      return { ...res.data, todos: [] };
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const updateList = createAsyncThunk(
+  'todos/updateList',
+  async ({ listId, data }, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.put(`/api/todos/${listId}`, data);
+
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const deleteList = createAsyncThunk(
+  'todos/deleteList',
+  async (listId) => {
+    try {
+      const res = await apiClient.delete(`/api/todos/${listId}`);
+
+      return listId;
+    } catch (error) {
+      return error.response.data;
+    }
+  },
+);
+
+const todoSlice = createSlice({
+  name: 'todos',
+  initialState,
+  reducers: {
+    setError(state, action) {
+      state.error = action.payload;
+      state.loading = false;
+    },
+  },
+  extraReducers: {
+    [loadLists.pending]: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    [loadLists.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.lists = action.payload;
+    },
+    [loadLists.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [createList.pending]: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    [createList.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.lists.push(action.payload);
+    },
+    [createList.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [updateList.pending]: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    [updateList.fulfilled]: (state, action) => {
+      const index = state.lists.findIndex(
+        (list) => list.id === action.payload.id,
+      );
+      state.lists.splice(index, 1, action.payload);
+      state.loading = false;
+    },
+    [updateList.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    [deleteList.pending]: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    [deleteList.fulfilled]: (state, action) => {
+      let index = state.lists.findIndex((list) => list.id === action.payload);
+      state.lists.splice(index, 1);
+      state.loading = false;
+    },
+    [deleteList.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+  },
+});
+
+export const { setError } = todoSlice.actions;
 
 const todoReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -96,41 +219,9 @@ const todoReducer = (state = initialState, action) => {
         lists: updatedListsWithToggle,
       };
 
-    case SET_LOADING:
-      return { ...state, loading: true };
-
-    case SET_LISTS:
-      return { ...state, lists: action.payload, loading: false, error: null };
-
-    case UPDATE_LIST:
-      const upLists = state.lists.map((list) => {
-        if (list.id === action.payload.listId) {
-          return {
-            ...action.payload.upList,
-            itemscount: list.itemscount,
-          };
-        }
-        return list;
-      });
-
-      return { ...state, lists: upLists, loading: false, error: null };
-
-    case SET_ERROR:
-      return { ...state, error: action.payload, loading: false };
-
-    case ADD_LIST:
-      const newList = {
-        ...action.payload,
-      };
-      return {
-        ...state,
-        loading: false,
-        error: null,
-        lists: [...state.lists, newList],
-      };
     default:
       return state;
   }
 };
 
-export default todoReducer;
+export default todoSlice.reducer;
