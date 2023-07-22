@@ -29,7 +29,7 @@ const ListModal = ({ show, handleClose, list }) => {
       });
     } else {
       dispatch(createList(body)).then((result) => {
-        if (!result.errors) {
+        if (!result.error) {
           handleClose();
         }
       });
