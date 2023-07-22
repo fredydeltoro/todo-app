@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { checkLogin, setUser } from '/src/redux/actions/accountActions';
+import { checkLogin, removeUser } from '/src/redux/reducers/accountReducer';
 import { Link } from 'react-router-dom';
 import apiClient from '/src/lib/apiClient';
 
@@ -25,7 +25,7 @@ const Protected = ({ children }) => {
     e.preventDefault();
     localStorage.removeItem('token');
     apiClient.defaults.headers.common['Authorization'] = '';
-    dispatch(setUser(null));
+    dispatch(removeUser());
   };
 
   return (

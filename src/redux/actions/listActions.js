@@ -1,16 +1,5 @@
+import { createAsyncThunk } from '@reduxjs/toolkit';
 import apiClient from '/src/lib/apiClient';
-
-// Actions
-export const ADD_TODO = 'lists/addTodo';
-export const REMOVE_TODO = 'lists/removeTodo';
-export const UPDATE_TODO = 'list/updateTodo';
-export const ADD_LIST = 'lists/addList';
-export const REMOVE_LIST = 'lists/removeList';
-export const UPDATE_LIST = 'list/updateList';
-export const SET_LISTS = 'lists/setLists';
-export const SET_ERROR = 'lists/setError';
-export const SET_LOADING = 'lists/setLoading';
-export const SET_TODOS = 'list/setTodos';
 
 // Selectors
 export const selectLists = (state) => state.todos.lists;
@@ -20,221 +9,126 @@ export const selectTodoList = (listId) => (state) => {
   return lists.find((list) => list.id === listId);
 };
 
-// Action Creators
-export const setTodos = (listId, todos) => ({
-  type: SET_TODOS,
-  payload: { listId, todos },
-});
+export const loadLists = createAsyncThunk(
+  'todos/loadLists',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.get('/api/todos');
+      return res.data;
+    } catch (error) {
+      return rejectWithValue({ error: error.res.data });
+    }
+  },
+);
 
-export const addTodo = (listId, todo) => ({
-  type: ADD_TODO,
-  payload: { listId, todo },
-});
+export const createList = createAsyncThunk(
+  'todos/createList',
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.post('/api/todos', data);
 
-export const removeTodo = (listId, todoId) => ({
-  type: REMOVE_TODO,
-  payload: { listId, todoId },
-});
+      return { ...res.data, todos: [] };
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
 
-export const updateTodo = (listId, upTodo) => ({
-  type: UPDATE_TODO,
-  payload: { listId, upTodo },
-});
+export const updateList = createAsyncThunk(
+  'todos/updateList',
+  async ({ listId, data }, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.put(`/api/todos/${listId}`, data);
 
-export const addList = (payload) => ({
-  type: ADD_LIST,
-  payload,
-});
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
 
-export const updateList = (listId, upList) => ({
-  type: UPDATE_LIST,
-  payload: { listId, upList },
-});
+export const deleteList = createAsyncThunk(
+  'todos/deleteList',
+  async (listId, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.delete(`/api/todos/${listId}`);
 
-export const setLists = (lists) => ({
-  type: SET_LISTS,
-  payload: lists,
-});
+      return listId;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
 
-export const removeList = (listId) => ({
-  type: REMOVE_LIST,
-  payload: { listId },
-});
+export const createTodo = createAsyncThunk(
+  'todos/createTodo',
+  async ({ listId, data }, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.post(`/api/todos/${listId}/items`, data);
 
-export const setError = (error) => ({
-  type: SET_ERROR,
-  payload: error,
-});
+      return { listId, data: res.data };
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
 
-export const setLoading = () => ({
-  type: SET_LOADING,
-});
+export const loadTodos = createAsyncThunk(
+  'todos/loadTodos',
+  async (listId, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.get(`/api/todos/${listId}/items`);
 
-export const loadLists = () => async (dispatch) => {
-  try {
-    const res = await apiClient.get('/api/todos');
-    dispatch(setLists(res.data));
-    return res.data;
-  } catch (error) {
-    dispatch(setError(error.res.data));
-    return { error: error.res.data };
-  }
-};
+      return { listId, data: res.data };
+    } catch (error) {
+      return rejectWithValue(error.res.data);
+    }
+  },
+);
 
-export const loadListComplete = (listId) => async (dispatch) => {
-  try {
-    const resList = await apiClient.get(`/api/todos/${listId}`);
-    const resTodos = await apiClient.get(`/api/todos/${listId}/items`);
-    const list = resList.data;
-    list.todos = resTodos.data;
+export const updateTodo = createAsyncThunk(
+  'todos/updateTodo',
+  async ({ listId, todoId, props }, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.patch(
+        `/api/todos/${listId}/items/${todoId}`,
+        props,
+      );
 
-    dispatch(addList(list));
-  } catch (error) {
-    dispatch(setError(error.res.data));
-  }
-};
+      return { listId, data: res.data };
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
 
-export const loadTodos = (listId) => async (dispatch) => {
-  try {
-    const res = await apiClient.get(`/api/todos/${listId}/items`);
-    dispatch(setTodos(listId, res.data));
-  } catch (error) {
-    dispatch(setError(error.res.data));
-  }
-};
+export const loadListComplete = createAsyncThunk(
+  'todos/loadListComplete',
+  async (listId, { rejectWithValue }) => {
+    try {
+      const resList = await apiClient.get(`/api/todos/${listId}`);
+      const resTodos = await apiClient.get(`/api/todos/${listId}/items`);
+      const list = resList.data;
+      list.todos = resTodos.data;
 
-export const createList = (data) => async (dispatch) => {
-  function onSuccess(success) {
-    dispatch(addList(success));
+      return list;
+    } catch (error) {
+      return rejectWithValue(error.res.data);
+    }
+  },
+);
 
-    return success;
-  }
+export const deleteTodo = createAsyncThunk(
+  'todos/deleteTodo',
+  async ({ listId, todoId }, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.delete(
+        `/api/todos/${listId}/items/${todoId}`,
+      );
 
-  function onError(err) {
-    dispatch(setError(err));
-    return err;
-  }
-
-  try {
-    dispatch(setLoading());
-    const res = await apiClient.post('/api/todos', data);
-
-    return onSuccess({ ...res.data, todos: [] });
-  } catch (error) {
-    return onError(error.response.data);
-  }
-};
-
-export const putList = (listId, data) => async (dispatch) => {
-  function onSuccess(success) {
-    dispatch(updateList(listId, success));
-
-    return success;
-  }
-
-  function onError(error) {
-    dispatch(setError(error));
-
-    return { error };
-  }
-
-  try {
-    const res = await apiClient.put(`/api/todos/${listId}`, data);
-
-    return onSuccess(res.data);
-  } catch (err) {
-    return onError(err.response.data);
-  }
-};
-
-export const deleteList = (listId) => async (dispatch) => {
-  function onSuccess(success) {
-    dispatch(removeList(listId));
-
-    return success;
-  }
-
-  function onError(err) {
-    dispatch(setError(err));
-
-    return { error: err };
-  }
-
-  try {
-    const res = await apiClient.delete(`/api/todos/${listId}`);
-
-    return onSuccess(res.data);
-  } catch (error) {
-    return onError(error.response.data);
-  }
-};
-
-export const createTodo = (listId, data) => async (dispatch) => {
-  function onSuccess(success) {
-    dispatch(addTodo(listId, success));
-
-    return success;
-  }
-
-  function onError(err) {
-    dispatch(setError(err));
-
-    return { error: err };
-  }
-
-  try {
-    dispatch(setLoading());
-    const res = await apiClient.post(`/api/todos/${listId}/items`, data);
-
-    return onSuccess(res.data);
-  } catch (err) {
-    return onError(err.response.data);
-  }
-};
-
-export const patchTodo = (listId, todoId, props) => async (dispatch) => {
-  function onSuccess(success) {
-    dispatch(updateTodo(listId, success));
-
-    return success;
-  }
-
-  function onError(err) {
-    dispatch(setError(err));
-
-    return { error: err };
-  }
-
-  try {
-    const res = await apiClient.patch(
-      `/api/todos/${listId}/items/${todoId}`,
-      props,
-    );
-
-    return onSuccess(res.data);
-  } catch (error) {
-    return onError(error.response.data);
-  }
-};
-
-export const deleteTodo = (listId, todoId) => async (dispatch) => {
-  function onSuccess(success) {
-    dispatch(removeTodo(listId, todoId));
-
-    return success;
-  }
-
-  function onError(err) {
-    dispatch(setError(err));
-
-    return { error: err };
-  }
-
-  try {
-    const res = await apiClient.delete(`/api/todos/${listId}/items/${todoId}`);
-
-    return onSuccess(res.data);
-  } catch (error) {
-    return onError(error.response.data);
-  }
-};
+      return { listId, todoId };
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);

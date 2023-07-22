@@ -1,14 +1,16 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import Menu from '/src/components/Menu';
-import { patchTodo } from '/src/redux/actions/listActions';
+import { updateTodo } from '/src/redux/actions/listActions';
 import styles from './todo.module.css';
 
 const Todo = ({ todo, listId, openEdit, handleDelete }) => {
   const dispatch = useDispatch();
 
   const handleCheck = (checked) => {
-    dispatch(patchTodo(listId, todo.id, { status: checked }));
+    dispatch(
+      updateTodo({ listId, todoId: todo.id, props: { status: checked } }),
+    );
   };
 
   return (
