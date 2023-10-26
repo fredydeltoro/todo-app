@@ -1,22 +1,24 @@
-.login {
-  position: relative;
+.signup {
   padding-top: 7%;
 }
 
 .title {
   margin-bottom: 80px;
-  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 .loading {
   position: absolute;
-  top: 68%;
+  top: 42%;
   left: 48%;
 }
 
-.signup {
+.form {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 15px;
+  width: 100%;
+  padding: 0 30%;
 }

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { makeLogin } from '/src/redux/reducers/accountReducer';
 import style from './styles.module.css';
 
@@ -66,6 +66,9 @@ const Login = () => {
               >
                 Submit
               </button>
+            </div>
+            <div className={style.signup}>
+              <Link to="/signup">Sing Up</Link>
             </div>
           </form>
           {loading && (

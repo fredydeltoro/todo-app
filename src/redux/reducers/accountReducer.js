@@ -8,18 +8,21 @@ const initialState = {
   error: null,
 };
 
-export const makeLogin = createAsyncThunk('account/makeLogin', async (body) => {
-  try {
-    const res = await apiClient.post('/api/login', body);
-    const token = res.data.token;
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    localStorage.setItem('token', token);
+export const makeLogin = createAsyncThunk(
+  'account/makeLogin',
+  async (body, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.post('/api/login', body);
+      const token = res.data.token;
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      localStorage.setItem('token', token);
 
-    return jwt_decode(token);
-  } catch (error) {
-    return error.response.data;
-  }
-});
+      return jwt_decode(token);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
 
 export const checkLogin = createAsyncThunk('account/checkLogin', () => {
   const token = localStorage.getItem('token');
