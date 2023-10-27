@@ -1,18 +1,18 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
+import { makeSignup } from '/src/redux/reducers/accountReducer';
 import style from './styles.module.css';
 
 const Signup = () => {
-  const { user, error } = useSelector((state) => state.account);
-  const loading = false;
+  const { user, error, loading } = useSelector((state) => state.account);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const onSubmit = (e) => {
     e.preventDefault();
     let formData = new FormData(e.target);
-    formData.delete('confirmation');
 
-    console.log('=======>', Object.fromEntries(formData));
+    dispatch(makeSignup(formData));
   };
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const Signup = () => {
             >
               {error && (
                 <div className="alert alert-danger" role="alert">
-                  {error.error}
+                  {error?.error}
                 </div>
               )}
               <div className="">
@@ -62,13 +62,13 @@ const Signup = () => {
               </div>
               <div className="col-6">
                 <label htmlFor="user" className="form-label">
-                  User
+                  Username
                 </label>
                 <input
                   type="text"
                   className="form-control"
-                  id="user"
-                  name="user"
+                  id="username"
+                  name="username"
                 />
               </div>
               <div className="col-6">
@@ -94,14 +94,14 @@ const Signup = () => {
                 />
               </div>
               <div className="col-6">
-                <label htmlFor="confirmation" className="form-label">
+                <label htmlFor="password2" className="form-label">
                   Confirm Password
                 </label>
                 <input
                   type="password"
                   className="form-control"
-                  id="confirmation"
-                  name="confirmation"
+                  id="password2"
+                  name="password2"
                 />
               </div>
               <div className="d-grid gap-2 col-6 mx-auto">
