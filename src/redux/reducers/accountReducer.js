@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import apiClient from '/src/lib/apiClient';
+import handleCredentials from '/src/lib/handleCredentials';
 import jwt_decode from 'jwt-decode';
 
 const initialState = {
@@ -8,18 +9,33 @@ const initialState = {
   error: null,
 };
 
-export const makeLogin = createAsyncThunk('account/makeLogin', async (body) => {
-  try {
-    const res = await apiClient.post('/api/login', body);
-    const token = res.data.token;
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    localStorage.setItem('token', token);
+export const makeSignup = createAsyncThunk(
+  'account/makeSingup',
+  async (body, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.post('/api/signup', body);
+      const user = handleCredentials(res.data.token, apiClient);
 
-    return jwt_decode(token);
-  } catch (error) {
-    return error.response.data;
-  }
-});
+      return user;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const makeLogin = createAsyncThunk(
+  'account/makeLogin',
+  async (body, { rejectWithValue }) => {
+    try {
+      const res = await apiClient.post('/api/login', body);
+      const user = handleCredentials(res.data.token, apiClient);
+
+      return user;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
 
 export const checkLogin = createAsyncThunk('account/checkLogin', () => {
   const token = localStorage.getItem('token');
@@ -49,6 +65,22 @@ const accountSlice = createSlice({
     },
   },
   extraReducers: {
+    [makeSignup.pending]: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+
+    [makeSignup.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.error = null;
+      state.user = action.payload;
+    },
+
+    [makeSignup.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
     [makeLogin.pending]: (state) => {
       state.loading = true;
       state.error = null;
